@@ -23,7 +23,8 @@ let SOLC_BIN_ENV = null;
 const SOLC_LIST_EXPIRES_IN_SECONDS = 1 * 60 * 60; // 1 hour
 
 // and where to download it from
-const SOLC_LIST_URL = 'https://solc-bin.ethereum.org/bin/list.json';
+const SOLC_LIST_URL = 'http://solc-bin.ethereum.org/bin/list.json';
+const SOLC_BIN_URL = 'http://solc-bin.ethereum.org/bin/';
 
 export interface SolcCompiler {
   version(): string;
@@ -177,7 +178,7 @@ async function getCompilerVersion(requiredSemvers: string[], solcList: SolcList)
 async function downloadCompiler(build: SolcBuild, localFile: string): Promise<void> {
   const { version, keccak256: expectedHash, path: versionPath } = build;
   Loggy.onVerbose(__filename, 'downloadCompiler', 'download-compiler', `Downloading compiler version ${version}`);
-  const url = `https://solc-bin.ethereum.org/bin/${versionPath}`;
+  const url = `${SOLC_BIN_URL}${versionPath}`;
   const { data: compilerSource } = await axios.get(url);
 
   // Verify checksum
