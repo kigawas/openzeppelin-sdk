@@ -6,6 +6,7 @@ import Contract from '../artifacts/Contract';
 import ProxyFactory from '../proxy/ProxyFactory';
 import ProxyAdminProjectMixin from './mixin/ProxyAdminProjectMixin';
 import { TxParams } from '../artifacts/ZWeb3';
+import { Proxy } from '..';
 
 class BaseProxyAdminProject extends BaseSimpleProject {
   public proxyAdmin: ProxyAdmin;
@@ -26,7 +27,7 @@ class BaseProxyAdminProject extends BaseSimpleProject {
     this.proxyAdmin = proxyAdmin;
   }
 
-  public async createProxy(contract: Contract, contractParams: ContractInterface = {}): Promise<Contract> {
+  public async createProxy(contract: Contract, contractParams: ContractInterface = {}): Promise<Proxy> {
     if (!contractParams.admin) await this.ensureProxyAdmin();
     return super.createProxy(contract, contractParams);
   }
@@ -45,7 +46,7 @@ class BaseProxyAdminProject extends BaseSimpleProject {
     proxyAddress: string,
     contract: Contract,
     contractParams: ContractInterface = {},
-  ): Promise<Contract> {
+  ): Promise<any> {
     const { initMethod: initMethodName, initArgs } = contractParams;
     const { implementationAddress, pAddress: checkedProxyAddress } = await this._setUpgradeParams(
       proxyAddress,
@@ -58,9 +59,15 @@ class BaseProxyAdminProject extends BaseSimpleProject {
       `action-proxy-${checkedProxyAddress}`,
       `Upgrading instance at ${checkedProxyAddress}`,
     );
-    await this.proxyAdmin.upgradeProxy(checkedProxyAddress, implementationAddress, contract, initMethodName, initArgs);
+    const receipt = await this.proxyAdmin.upgradeProxy(
+      checkedProxyAddress,
+      implementationAddress,
+      contract,
+      initMethodName,
+      initArgs,
+    );
     Loggy.succeed(`action-proxy-${checkedProxyAddress}`, `Instance at ${checkedProxyAddress} upgraded`);
-    return contract.at(checkedProxyAddress);
+    return receipt;
   }
 
   public getAdminAddress(): Promise<string> {

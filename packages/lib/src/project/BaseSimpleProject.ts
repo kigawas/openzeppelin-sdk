@@ -113,7 +113,7 @@ export default abstract class BaseSimpleProject {
   public async createProxy(
     contract,
     { packageName, contractName, initMethod, initArgs, redeployIfChanged, admin }: ContractInterface = {},
-  ): Promise<Contract> {
+  ): Promise<Proxy> {
     if (!isEmpty(initArgs) && !initMethod) initMethod = 'initialize';
     const implementationAddress = await this._getOrDeployImplementation(
       contract,
@@ -125,7 +125,7 @@ export default abstract class BaseSimpleProject {
     const proxyAdmin = admin || (await this.getAdminAddress());
     const proxy = await Proxy.deploy(implementationAddress, proxyAdmin, initCallData, this.txParams);
     Loggy.succeed(`create-proxy`, `Instance created at ${proxy.address}`);
-    return contract.at(proxy.address);
+    return proxy;
   }
 
   public async createProxyWithSalt(

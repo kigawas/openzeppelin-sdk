@@ -54,7 +54,7 @@ export default class ProxyAdmin {
     contract: Contract,
     initMethodName: string,
     initArgs: any,
-  ): Promise<Contract> {
+  ): Promise<any> {
     if (!isEmpty(initArgs) && !initMethodName) initMethodName = 'initialize';
     const receipt: any =
       initMethodName === undefined
@@ -64,7 +64,7 @@ export default class ProxyAdmin {
       `upgrade-proxy-${proxyAddress}`,
       `Instance upgraded at ${proxyAddress}. Transaction receipt: ${receipt.transactionHash}`,
     );
-    return contract.at(proxyAddress);
+    return receipt;
   }
 
   public async transferOwnership(newAdminOwner: string): Promise<void> {
